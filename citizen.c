@@ -1,5 +1,4 @@
-#include <windows.h>
-
+#include <stdlib.h>
 typedef enum { HIGHER = 0, MEDIUM = 1, LOWER = 2 } PRIORITY;
 
 typedef struct Citizen {
