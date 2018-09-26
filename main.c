@@ -3,9 +3,10 @@
 
 int main()
 {
-    Citizen* citizen = makeCitizen(LOWER, 1);
+    Citizen* citizen = makeCitizen(LOWER, "0P");
 
     change_priority(citizen, MEDIUM);
-	printf("%d, %d\n", citizen->priority, citizen->id);
+	start(citizen);
+	printf("%d, %s\n", citizen->priority, citizen->id);
 	return 0;
 }
