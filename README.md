@@ -10,7 +10,11 @@ Objetivo do trabalho
 
 O objetivo deste trabalho é implementar um programa na linguagem C que faça o gerenciamento das filas conforme descrito acima. As filas deverão ser implementadas na forma de uma multilista conforme a figura abaixo:
 
+
+
 ![multilista](https://preview.ibb.co/dmzcDe/5e65cd18_5af7_4967_b119_436f44f222c2.jpg)
+
+
 
 Somente o apontador para a fila principal deverá ser mantido. 
 
