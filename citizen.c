@@ -8,7 +8,6 @@ typedef struct Citizen {
     PRIORITY priority;
     char id[2];
 	pthread_t thread;
-	
 } Citizen;
 
 Citizen* makeCitizen(PRIORITY priority, char id[2])
@@ -23,10 +22,10 @@ Citizen* makeCitizen(PRIORITY priority, char id[2])
 
 void* thread_func(void* args) {}
 
-void start(Citizen* self)
+void start(Citizen* this)
 {
-	if (!self->thread)
-		pthread_create(&self->thread, NULL, thread_func, NULL);
+	if (!this->thread)
+		pthread_create(&this->thread, NULL, thread_func, NULL);
 }
 
 void change_priority(Citizen* citizen, PRIORITY priority)
