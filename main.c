@@ -1,18 +1,26 @@
-#include <stdio.h>
-#include "citizenqueue.c"
+#include "controller.c"
 
-
-int main()
-{
-    Citizen* citizen = makeCitizen(MEDIUM, "0P");
-	CitizenQueue* queue = makeQueue();
+void main(int argc, char* argv[]) {
+	citizen_queue[0] = make_queue(citizen_queue[0]);
+	citizen_queue[1] = make_queue(citizen_queue[1]);
+	citizen_queue[2] = make_queue(citizen_queue[2]);
 	
-	enqueue(queue, citizen);
-	Citizen* first = peek_queue(queue);
+	pthread_t generator;
+	pthread_create(&generator, NULL, citizen_generator, NULL);
+	int counters_amount = atoi(argv[1]);
 	
-	printf("Citizen id: %s\n", first->id);
-	printf("Citizen credentials: %d\n", first->priority);
-	printf("Current queue tail: %s\n", first->id);
+	printf("Counters: %i", counters_amount);
+	pthread_t threads[counters_amount];
+	int thread_success;
 	
-	return 0;
+	for (int i = 0; i < counters_amount; i++) {
+		thread_success = pthread_create(&(threads[i]), NULL, counter_thread, NULL);
+		
+		if (thread_success != 0) {
+			printf("Error while creating thread");
+		}
+	}
+	
+	for (int j = 0; j < counters_amount; j++)
+		pthread_join(threads[j], NULL);
 }
