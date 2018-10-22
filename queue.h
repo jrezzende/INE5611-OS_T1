@@ -12,7 +12,7 @@ typedef struct Citizen {
 
 Citizen* make_queue(Citizen* queue);
 Citizen* enqueue(Citizen* queue, int priority, int turn);
-Citizen* dequeue(Citizen* queue, int turn);
+Citizen* dequeue(Citizen* queue, int* turn);
 Citizen* next(Citizen* queue);
 
 void show_queue(Citizen* queue);
