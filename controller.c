@@ -1,63 +1,77 @@
-#include "queue.c"
-#include <stdio.h>
-#include <unistd.h>
+#include "controller.h"
 
-Citizen* citizen_queue[3];
-int counter_value = 0;
-
-void* aging()
+void aging() // aging algorithm
 {
 	if (counter_value % 3 == 0) {
+		
 			if (queue_size(citizen_queue[1]) > 0) {
 				citizen_queue[0] = enqueue(citizen_queue[0], citizen_queue[1]->priority, citizen_queue[1]->turn);
-				citizen_queue[1] = next(citizen_queue[1]);
+				citizen_queue[1] = dequeue(citizen_queue[1]);
 				
 				if (queue_size(citizen_queue[2]) > 0) {
 					citizen_queue[0] = enqueue(citizen_queue[1], citizen_queue[2]->priority, citizen_queue[2]->turn);
-					citizen_queue[2] = next(citizen_queue[2]);
+					citizen_queue[2] = dequeue(citizen_queue[2]);
 				}
 			} else {
 				if (queue_size(citizen_queue[2]) > 0) {
 					citizen_queue[0] = enqueue(citizen_queue[0], citizen_queue[2]->priority, citizen_queue[2]->turn);
-					citizen_queue[2] = next(citizen_queue[2]);
+					citizen_queue[2] = dequeue(citizen_queue[2]);
 				}
 			}
 	}
 }
 
-void* counter_thread(void* args) 
+void* counter_thread(void* args) // thread guiche func 
 {
-	while (citizen_queue[0] != NULL) {
-		if (counter_value % 3 == 0) { // 3 citizens from queue[0] in a row
-			aging();
-		}
+	while (citizen_queue[0] != NULL) { // avoid starvation... apply aging
+		aging();
 		
 		sleep(rand() % 15); // attending a citizen...
 		
-		printf("Current counter id: %li with Citizen: %iP%i\n\n", pthread_self(), citizen_queue[0]->priority + 1, citizen_queue[0]->turn);
-		citizen_queue[0] = next(citizen_queue[0]);
+		printf("Current counter id: %li with Citizen: %iP%i\n\n", pthread_self(), citizen_queue[0]->priority, citizen_queue[0]->turn);
+		citizen_queue[0] = dequeue(citizen_queue[0]);
 		counter_value++;
 		
 		show_queue(citizen_queue[0]);
 	}
 	pthread_exit(NULL);
+	return NULL;
 }
 
-void* citizen_generator(void* args)
+counter_turns* make_counter_turns() // queue counter value
 {
-	int counter_turns[3];
+	counter_turns* current_counter = ((counter_turns*) malloc(sizeof(counter_turns)));
 	
-	counter_turns[0] = 0;
-	counter_turns[1] = 0;
-	counter_turns[2] = 0;
+	current_counter->turns[0] = 0;
+	current_counter->turns[1] = 0;
+	current_counter->turns[2] = 0;
 	
-	srand(time(NULL));
+	return current_counter;
+}
 	
-	while(1) {
-		int queue_number = (rand() % 3);
-		counter_turns[queue_number]++;
-		citizen_queue[queue_number] = enqueue(citizen_queue[queue_number], queue_number, counter_turns[queue_number]);
+void generate(counter_turns* counter) // generator
+{	
+	int queue_number = (rand() % 3);
+		counter->turns[queue_number] += 1;
+		citizen_queue[queue_number] = enqueue(citizen_queue[queue_number], queue_number, counter->turns[queue_number]);
 		sleep(rand() % 3);
+}
+
+void* citizen_generator(void* args) // citizen generator controller
+{
+	srand(time(NULL));
+	counter_turns* counter = make_counter_turns();
+	
+	while(true) {
+		generate(counter);
 	}
+	
 	pthread_exit(NULL);
+}
+
+bool is_null(Citizen* citizen) // is citizen null?
+{
+	if (citizen == NULL)
+		return true;
+	return false;
 }

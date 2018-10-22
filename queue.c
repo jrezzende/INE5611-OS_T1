@@ -1,70 +1,62 @@
 #include "queue.h"
 
-pthread_mutex_t MUTEX = PTHREAD_MUTEX_INITIALIZER;
-
-Citizen* make_queue(Citizen* queue)
+Citizen* make_queue(Citizen* queue) // instantiates a queue 
 {
-	queue = MALLOC(Citizen);
+	queue = ((Citizen*)malloc(sizeof(Citizen)));
 	return queue;
 }
 
-Citizen* new_node;
-
-Citizen* enqueue(Citizen* queue, int priority, int turn)
+Citizen* make_citizen(int priority, int turn) // instantiates a citizen
 {
-	pthread_mutex_lock(&MUTEX);
+	Citizen* new = ((Citizen*)malloc(sizeof(Citizen)));
 	
-	Citizen* temp;
-	temp = queue;
-	new_node = MALLOC(Citizen);
+	new->next_citizen = NULL;
+	new->priority = priority;
+	new->turn = turn;
 	
-	new_node->next_citizen = NULL;
-	new_node->priority = priority;
-	new_node->turn = turn;
+	return new;
+}
+
+Citizen* enqueue(Citizen* queue, int priority, int turn) // puts a citizen in queue
+{
+	lock();
+	Citizen* temp = queue;
 	
-	if(queue_size(queue) > 0) {
+	new_node = make_citizen(priority, turn);
+	
+	if (new_node->priority > 2)
+		return NULL;
+	
+	if(queue_size(queue) == 0) {
+		queue = new_node;
+	} else {
 		while(temp->next_citizen != NULL)
 			temp= temp->next_citizen;
-		temp->next_citizen = new_node;
-	} else {
-		queue = new_node;
+		temp->next_citizen = new_node; // end of the queue
 	}
-	pthread_mutex_unlock(&MUTEX);
 	
+	unlock();
 	return queue;
 }
 
-Citizen* dequeue(Citizen* queue, int* turn)
+Citizen* dequeue(Citizen* queue) // removes a citizen from the beggining of the queue
 {
-	pthread_mutex_lock(&MUTEX);
-	
-	Citizen* next_in_line;
-	next_in_line = queue->next_citizen;
-	
-	free(queue);
-	(*turn)++;
-	
-	pthread_mutex_unlock(&MUTEX);
-	
-	return next_in_line;
-}
-
-Citizen* next(Citizen* queue)
-{
-	pthread_mutex_lock(&MUTEX);
+	lock();
 	Citizen* temp;
 	temp = queue;
+	
 	if (queue != NULL) {
 		queue = queue->next_citizen;
 		free(temp);
 		pthread_mutex_unlock(&MUTEX);
 		return queue;
 	}
-	pthread_mutex_unlock(&MUTEX);
+	
+	unlock();
 	return NULL;
 }
 
-int queue_size(Citizen* queue)
+int queue_size(Citizen* queue) // return current queue size
 {
 	int amount = 0;
 	Citizen* current = queue;
@@ -77,10 +69,10 @@ int queue_size(Citizen* queue)
 	return amount;
 }
 
-void show_queue(Citizen* queue)
+void show_queue(Citizen* queue) // show current queue
 {
 	if (queue == NULL) {
-		printf("The queue is empty.\n");
+		printf("The queue number %d is empty.\n", queue->priority);
 		return;
 	}
 	
@@ -88,10 +80,20 @@ void show_queue(Citizen* queue)
 	int size = 0;
 	
 	while (aux != NULL) {
-		printf("Citizen: %iP%i (-_-)\n", aux->priority + 1, aux->turn);
+		printf("Citizen: %iP%i (-_-)\n", aux->priority, aux->turn);
 		aux = aux->next_citizen;
 		size++;
 	}
 	
-	printf("There are currently %d citizens waiting in line.\n", size);
+	printf("There are currently %d citizens waiting in queue %d.\n", size, queue->priority);
+}
+
+void lock() // lock mutex
+{
+	pthread_mutex_lock(&MUTEX);	
+}
+
+void unlock() // unlock mutex
+{
+	pthread_mutex_unlock(&MUTEX);
 }
