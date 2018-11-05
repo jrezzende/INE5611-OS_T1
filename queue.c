@@ -1,6 +1,21 @@
 #include "queue.h"
+#include <pthread.h>
 
-Citizen* make_queue(Citizen* queue) // instantiates a queue 
+pthread_mutex_t MUTEX = PTHREAD_MUTEX_INITIALIZER; // MUTEX INITIALIZER
+
+void lock() // lock mutex
+{
+	pthread_mutex_lock(&MUTEX);	
+}
+
+void unlock() // unlock mutex
+{
+	pthread_mutex_unlock(&MUTEX);
+}
+
+///////////////////////////////////////////////////////////////
+
+Citizen* make_queue(Citizen* queue) // instantiate a queue 
 {
 	queue = ((Citizen*)malloc(sizeof(Citizen)));
 	return queue;
@@ -86,14 +101,4 @@ void show_queue(Citizen* queue) // show current queue
 	}
 	
 	printf("There are currently %d citizens waiting in queue %d.\n", size, queue->priority);
-}
-
-void lock() // lock mutex
-{
-	pthread_mutex_lock(&MUTEX);	
-}
-
-void unlock() // unlock mutex
-{
-	pthread_mutex_unlock(&MUTEX);
 }

@@ -9,12 +9,12 @@ void aging() // aging algorithm
 				citizen_queue[1] = dequeue(citizen_queue[1]);
 				
 				if (queue_size(citizen_queue[2]) > 0) {
-					citizen_queue[0] = enqueue(citizen_queue[1], citizen_queue[2]->priority, citizen_queue[2]->turn);
+					citizen_queue[1] = enqueue(citizen_queue[1], citizen_queue[2]->priority, citizen_queue[2]->turn);
 					citizen_queue[2] = dequeue(citizen_queue[2]);
 				}
 			} else {
 				if (queue_size(citizen_queue[2]) > 0) {
-					citizen_queue[0] = enqueue(citizen_queue[0], citizen_queue[2]->priority, citizen_queue[2]->turn);
+					citizen_queue[1] = enqueue(citizen_queue[0], citizen_queue[2]->priority, citizen_queue[2]->turn);
 					citizen_queue[2] = dequeue(citizen_queue[2]);
 				}
 			}
@@ -30,11 +30,11 @@ void* counter_thread(void* args) // thread guiche func
 		
 		printf("Current counter id: %li with Citizen: %iP%i\n\n", pthread_self(), citizen_queue[0]->priority, citizen_queue[0]->turn);
 		citizen_queue[0] = dequeue(citizen_queue[0]);
+		
 		counter_value++;
 		
-		show_queue(citizen_queue[0]);
+		show_queue(citizen_queue[citizen_queue[0]->priority]);
 	}
-	pthread_exit(NULL);
 	return NULL;
 }
 
@@ -51,10 +51,10 @@ counter_turns* make_counter_turns() // queue counter value
 	
 void generate(counter_turns* counter) // generator
 {	
-	int queue_number = (rand() % 3);
-		counter->turns[queue_number] += 1;
-		citizen_queue[queue_number] = enqueue(citizen_queue[queue_number], queue_number, counter->turns[queue_number]);
-		sleep(rand() % 3);
+	int queue_number = (rand() % 3); 
+	counter->turns[queue_number] += 1;
+	citizen_queue[queue_number] = enqueue(citizen_queue[queue_number], queue_number, counter->turns[queue_number]);
+	sleep(rand() % 3);
 }
 
 void* citizen_generator(void* args) // citizen generator controller
