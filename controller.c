@@ -38,15 +38,15 @@ void* counter_thread(void* args) // thread guiche func
 	return NULL;
 }
 
-counter_turns* make_counter_turns() // queue counter value
+queue_turns* make_queue_turns() // queue counter value
 {
-	counter_turns* current_counter = ((counter_turns*) malloc(sizeof(counter_turns)));
+	queue_turns* queue_counter = ((queue_turns*) malloc(sizeof(queue_turns)));
 	
-	current_counter->turns[0] = 0;
-	current_counter->turns[1] = 0;
-	current_counter->turns[2] = 0;
+	queue_turns->turns[0] = 0;
+	queue_turns->turns[1] = 0;
+	queue_turns->turns[2] = 0;
 	
-	return current_counter;
+	return queue_turns;
 }
 	
 void generate(counter_turns* counter) // generator

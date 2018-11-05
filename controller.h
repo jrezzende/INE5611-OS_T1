@@ -3,11 +3,11 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-typedef struct counter_turns {
+typedef struct queue_turns {
 	int turns[3];
-} counter_turns; // base queue element
+} queue_turns; // base queue element
 
-counter_turns* make_counter_turns(); // instantiate turns counter values
+queue_turns* make_queue_turns(); // instantiate turns counter values
 
 void aging(); // aging to avoid starvation
 void* counter_thread(void* args); // thread guiche/counter
