@@ -15,10 +15,19 @@ void unlock() // unlock mutex
 
 ///////////////////////////////////////////////////////////////
 
-Citizen* make_queue(Citizen* queue) // instantiate a queue 
+Citizen* make_queue(int priority) // instantiate a queue 
 {
-	queue = ((Citizen*)malloc(sizeof(Citizen)));
+	Citizen* queue = ((Citizen*)malloc(sizeof(Citizen)));
+	queue->priority = priority;
+	queue = enqueue(queue, 100, 0);
+
 	return queue;
+}
+
+Citizen* append_queue(Citizen* current_queue, Citizen* to_append)
+{
+	current_queue->next_queue = to_append;
+	return current_queue;
 }
 
 Citizen* make_citizen(int priority, int turn) // instantiates a citizen
@@ -36,34 +45,39 @@ Citizen* enqueue(Citizen* queue, int priority, int turn) // puts a citizen in qu
 {
 	lock();
 	Citizen* temp = queue;
-	
 	new_node = make_citizen(priority, turn);
 	
 	if (new_node->priority > 2)
 		return NULL;
 	
 	if(queue_size(queue) == 0) {
-		queue = new_node;
+		head_node = new_node;
 	} else {
 		while(temp->next_citizen != NULL)
 			temp= temp->next_citizen;
 		temp->next_citizen = new_node; // end of the queue
 	}
-	
 	unlock();
 	return queue;
 }
 
 Citizen* dequeue(Citizen* queue) // removes a citizen from the beggining of the queue
 {
+	printf("Queue size: %d", queue_size(queue));
 	lock();
 	Citizen* temp;
 	temp = queue;
 	
+	if(queue->next_citizen == NULL) {
+		puts("Can't dequeue the head!");
+		unlock();
+		return queue;
+	}
+
 	if (queue != NULL) {
 		queue = queue->next_citizen;
 		free(temp);
-		pthread_mutex_unlock(&MUTEX);
+		unlock();
 		return queue;
 	}
 	
