@@ -2,7 +2,7 @@
 
 void apply_aging() // aging algorithm
 {
-	if (first_counter_value % 3 == 0) {
+	if (counter_value % 3 == 0) {
 			
 			if (queue_size(second_queue) > 0) {
 				first_queue = enqueue(first_queue, second_queue->priority, second_queue->turn);
@@ -23,16 +23,16 @@ void apply_aging() // aging algorithm
 
 void* counter_thread(void* args) // thread guiche func 
 {
-	while (first_queue != NULL) { // avoid starvation... apply aging
+	while (!is_null(first_queue)) { // avoid starvation... apply aging
 		apply_aging();
 		sleep(rand() % 15); // attending a citizen...
 		
-		printf("Current counter id: %li with Citizen: %iP%i\n\n", pthread_self(), first_queue->priority, first_queue->turn);
+		//printf("Current counter id: %li with Citizen: %iP%i\n\n", pthread_self(), first_queue->priority, first_queue->turn);
 
 		first_queue = dequeue(first_queue);
-		first_counter_value++;
+		counter_value++;
 
-		show_queue(first_queue);
+		//show_queue(first_queue);
 	}
 	return NULL;
 }
@@ -65,7 +65,12 @@ void generate(queue_turns* counter) // generator
 			break;
 	}
 
-	sleep(rand() % 5);
+	printf("First queue has: %d\n", queue_size(first_queue));
+	printf("Second queue has: %d\n", queue_size(second_queue));
+	printf("Third queue has: %d\n", queue_size(third_queue));
+	puts("----------------------------------------");
+
+	sleep(rand() % 3);
 }
 
 void* citizen_generator(void* args) // citizen generator controller
@@ -73,9 +78,8 @@ void* citizen_generator(void* args) // citizen generator controller
 	srand(time(NULL));
 	queue_turns* counter = make_queue_turns();
 	
-	while(true) {
+	while(true)
 		generate(counter);
-	}
 	
 	pthread_exit(NULL);
 }

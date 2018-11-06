@@ -19,7 +19,6 @@ Citizen* make_queue(int priority) // instantiate a queue
 {
 	Citizen* queue = ((Citizen*)malloc(sizeof(Citizen)));
 	queue->priority = priority;
-	queue = enqueue(queue, 100, 0);
 
 	return queue;
 }
@@ -51,7 +50,7 @@ Citizen* enqueue(Citizen* queue, int priority, int turn) // puts a citizen in qu
 		return NULL;
 	
 	if(queue_size(queue) == 0) {
-		head_node = new_node;
+		queue = new_node;
 	} else {
 		while(temp->next_citizen != NULL)
 			temp= temp->next_citizen;
@@ -63,13 +62,11 @@ Citizen* enqueue(Citizen* queue, int priority, int turn) // puts a citizen in qu
 
 Citizen* dequeue(Citizen* queue) // removes a citizen from the beggining of the queue
 {
-	printf("Queue size: %d", queue_size(queue));
 	lock();
 	Citizen* temp;
 	temp = queue;
 	
 	if(queue->next_citizen == NULL) {
-		puts("Can't dequeue the head!");
 		unlock();
 		return queue;
 	}
